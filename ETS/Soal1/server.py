@@ -9,26 +9,13 @@ player_data = {}
 with open('../player_data.json', 'r') as f:
     player_data = json.load(f)
 
-def version():
-    return 'versi 0.0.1'
-
 def process_request(request_string):
-    command_string = request_string.split(' ')
     result = None
-
     try:
-        command = command_string[0].strip()
+        player_number = request_string.strip()
 
-        if (command == 'get_player_data'):
-            logging.warning('Getting data')
-            player_number = command_string[1].strip()
-
-            logging.warning(f'Found data for {player_number}')
-            result = player_data[player_number]
-
-        elif (command == 'version'):
-            result = version()
-
+        logging.warning(f'Found data for {player_number}')
+        result = player_data[player_number]
     except Exception:
         result = None
 

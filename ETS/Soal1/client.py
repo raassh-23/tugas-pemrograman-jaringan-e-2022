@@ -28,13 +28,13 @@ def deserialized(s):
     return json.loads(s)
 
 
-def send_command(command_str):
+def send_request(request_str):
     sock = make_socket(server_name, server_port)
     logging.warning(f'connecting to {server_name}')
 
     try:
         logging.warning(f'sending message ')
-        sock.sendall(command_str.encode())
+        sock.sendall(request_str.encode())
 
         data_received = ''
         while True:
@@ -57,14 +57,8 @@ def send_command(command_str):
 
 
 def get_player_data(number=0):
-    command = f'get_player_data {number}\r\n\r\n'
-    result = send_command(command)
-    return result
-
-
-def get_version():
-    command = f'version \r\n\r\n'
-    result = send_command(command)
+    request = f'{number}\r\n\r\n'
+    result = send_request(request)
     return result
 
 def request_player_data():
@@ -81,10 +75,6 @@ def request_player_data():
         return -1
 
 if __name__ == '__main__':
-    h = get_version()
-    if (h):
-        print(h)
-
     request_count = 1000
     response_count = 0
     latency_sum = 0
