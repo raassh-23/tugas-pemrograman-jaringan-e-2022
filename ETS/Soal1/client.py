@@ -5,6 +5,7 @@ import json
 import logging
 import time
 import concurrent.futures
+import sys
 
 server_name = 'localhost'
 server_port = 12000
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     request_count = 1000
     response_count = 0
     latency_sum = 0
-    worker = 5
+    worker = int(sys.argv[1]) if len(sys.argv) >= 2 else 5
 
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=worker)
     tasks = {}
