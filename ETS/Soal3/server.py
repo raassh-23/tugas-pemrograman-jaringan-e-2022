@@ -2,6 +2,8 @@ import socket
 import threading
 import logging
 import json
+import ssl
+import os
 
 server_name = 'localhost'
 server_port = 12001
@@ -60,17 +62,25 @@ class HandleRequest(threading.Thread):
 class Server(threading.Thread):
 	def __init__(self):
 		self.clients = []
-		self.sockets = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		cert_location = os.getcwd() + '/certs/'
+		self.socket_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+		self.socket_context.load_cert_chain(
+            certfile=cert_location + 'domain.crt',
+            keyfile=cert_location + 'domain.key'
+        )
 		threading.Thread.__init__(self)
 
 	def run(self):
 		server_address = (server_name, server_port)
 		logging.warning(f'starting up on {server_address}')
-		self.sockets.bind(server_address)
-		self.sockets.listen(1000)
+		self.socket.bind(server_address)
+		self.socket.listen(1000)
 		while True:
-			self.connection, self.client_address = self.sockets.accept()
+			self.connection, self.client_address = self.socket.accept()
 			logging.warning(f"connection from {self.client_address}")
+
+			self.connection = self.socket_context.wrap_socket(self.connection, server_side=True)
 			
 			client = HandleRequest(self.connection, self.client_address)
 			client.start()
