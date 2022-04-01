@@ -19,11 +19,11 @@ def make_socket(destination_address='localhost', port=12000):
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_address = (destination_address, port)
-        logging.warning(f"connecting to {server_address}")
+        # logging.warning(f"connecting to {server_address}")
         sock.connect(server_address)
 
         secure_socket = context.wrap_socket(sock,server_hostname=destination_address)
-        logging.warning(secure_socket.getpeercert())
+        # logging.warning(secure_socket.getpeercert())
         
         return secure_socket
 
@@ -31,16 +31,16 @@ def make_socket(destination_address='localhost', port=12000):
         logging.warning(f'error {str(ee)}')
 
 def deserialized(s):
-    logging.warning(f'deserializing {s.strip()}')
+    # logging.warning(f'deserializing {s.strip()}')
     return json.loads(s)
 
 
 def send_request(request_str):
     sock = make_socket(server_name, server_port)
-    logging.warning(f'connecting to {server_name}')
+    logging.warning(f'connecting to {server_name} for request {request_str.strip()}')
 
     try:
-        logging.warning(f'sending message ')
+        # logging.warning(f'sending message ')
         sock.sendall(request_str.encode())
 
         data_received = ''
@@ -55,11 +55,11 @@ def send_request(request_str):
                 break
 
         result = deserialized(data_received)
-        logging.warning('data received from server:')
+        # logging.warning('data received from server:')
 
         return result
     except Exception as e:
-        logging.warning(f'error during data receiving {str(e)}')
+        # logging.warning(f'error during data receiving {str(e)}')
         return False
 
 
@@ -73,8 +73,8 @@ def request_player_data():
 
     result = get_player_data(random.randint(1, 25))
     if (result):
-        print(result['name'], result['number'], result['position'])
         latency = time.perf_counter() - time_request_start
+        print(result['name'], result['number'], result['position'])
         print(f'latency: {latency * 1000:.2f} ms')
         return latency
     else:
