@@ -6,16 +6,13 @@ import threading
 import time
 import sys
 
-
-server_name = 'localhost'
+server_name = '172.16.16.101'
 server_port = 12001
 
 def make_socket(destination_address='localhost', port=12000):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_address = (destination_address, port)
-
-        # logging.warning(f'connecting to {server_address}')
         sock.connect(server_address)
 
         return sock
@@ -24,7 +21,6 @@ def make_socket(destination_address='localhost', port=12000):
         logging.warning(f'error {str(ee)}')
 
 def deserialized(s):
-    # logging.warning(f'deserializing {s.strip()}')
     return json.loads(s)
 
 
@@ -33,7 +29,6 @@ def send_request(request_str):
     logging.warning(f'connecting to {server_name} for request {request_str.strip()}')
 
     try:
-        # logging.warning(f'sending message ')
         sock.sendall(request_str.encode())
 
         data_received = ''
@@ -48,11 +43,10 @@ def send_request(request_str):
                 break
 
         result = deserialized(data_received)
-        # logging.warning('data received from server:')
 
         return result
     except Exception as e:
-        # logging.warning(f'error during data receiving {str(e)}')
+        logging.warning(f'error during data receiving {str(e)}')
         return False
 
 
@@ -89,19 +83,21 @@ if __name__ == '__main__':
         loops_inner =  thread_count if loops >= thread_count else loops
 
         for i in range(loops_inner):
-            tasks[loops + i] = threading.Thread(target=request_player_data, args=(loops + i, results))
-            tasks[loops + i].start()
+            tasks[loops - i] = threading.Thread(target=request_player_data, args=(loops - i, results))
+            tasks[loops - i].start()
 
         for i in range(loops_inner):
-            tasks[loops + i].join()
-            if (results[loops + i] != -1):
+            tasks[loops - i].join()
+            if (results[loops - i] != -1):
                 response_count += 1
-                latency_sum += results[loops + i]
+                latency_sum += results[loops - i]
 
         loops -= loops_inner
     
-    print(f'With {thread_count} workers')
+    time_end = time.perf_counter()
+    
+    print(f'With {thread_count} threads')
     print(f'Request count: {request_count}')
     print(f'Response count: {response_count}')
-    print(f'Execution time: {(time.perf_counter() - time_start) * 1000:.3f} ms')
     print(f'Average Latency: {(latency_sum / response_count) * 1000:.3f} ms')
+    print(f'Execution time: {(time_end - time_start) * 1000:.3f} ms')

@@ -3,7 +3,7 @@ import logging
 import json
 from time import sleep
 
-server_name = 'localhost'
+server_name = '0.0.0.0'
 server_port = 12000
 
 player_data = {}
@@ -14,20 +14,16 @@ def process_request(request_string):
     result = None
     try:
         player_number = request_string.strip()
-
-        # logging.warning(f'Found data for {player_number}')
         result = player_data[player_number]
     except Exception:
         result = None
+
+    sleep(0.1) # simulate long processing
 
     return result
 
 def serialized(data):
     serialized = json.dumps(data)
-
-    # logging.warning('serializing data')
-    # logging.warning(serialized)
-
     return serialized
 
 
@@ -38,7 +34,7 @@ def run_server(server_address):
     logging.warning(f'starting up on {server_address}')
     sock.bind(server_address)
 
-    sock.listen(1)
+    sock.listen(10)
 
     while True:
         logging.warning('waiting for a connection')
@@ -48,13 +44,10 @@ def run_server(server_address):
         data_received = ''
         while True:
             data = connection.recv(32)
-            # logging.warning(f'received {data}')
             if data:
                 data_received += data.decode()
                 if '\r\n\r\n' in data_received:
                     result = process_request(data_received)
-                    # logging.warning(f'Result: {result}')
-                    sleep(1) # simulate long processing
 
                     result = serialized(result)
                     result += '\r\n\r\n'
@@ -62,7 +55,6 @@ def run_server(server_address):
                     break              
 
             else:
-                # logging.warning(f'no more data from {client_address}')
                 break
 
 if __name__ == '__main__':
