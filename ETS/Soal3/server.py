@@ -64,7 +64,7 @@ def run_server(server_address):
     logging.warning(f'starting up on {server_address}')
     sock.bind(server_address)
 
-    sock.listen(10)
+    sock.listen(1000)
 
     clients = []
 
