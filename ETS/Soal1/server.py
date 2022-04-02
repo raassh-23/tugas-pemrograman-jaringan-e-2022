@@ -1,6 +1,7 @@
 import socket
 import logging
 import json
+from time import sleep
 
 server_name = 'localhost'
 server_port = 12000
@@ -20,7 +21,6 @@ def process_request(request_string):
         result = None
 
     return result
-
 
 def serialized(data):
     serialized = json.dumps(data)
@@ -54,6 +54,7 @@ def run_server(server_address):
                 if '\r\n\r\n' in data_received:
                     result = process_request(data_received)
                     # logging.warning(f'Result: {result}')
+                    sleep(1) # simulate long processing
 
                     result = serialized(result)
                     result += '\r\n\r\n'

@@ -9,7 +9,7 @@ import ssl
 import os
 
 server_name = 'localhost'
-server_port = 12001
+server_port = 12002
 
 def make_socket(destination_address='localhost', port=12000):
     try:
@@ -82,10 +82,10 @@ def request_player_data():
         return -1
 
 if __name__ == '__main__':
-    request_count = 1000
+    worker = int(sys.argv[1]) if len(sys.argv) >= 2 else 5
+    request_count = int(sys.argv[2]) if len(sys.argv) >= 3 else 100
     response_count = 0
     latency_sum = 0
-    worker = int(sys.argv[1]) if len(sys.argv) >= 2 else 5
 
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=worker)
     tasks = {}
