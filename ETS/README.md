@@ -32,3 +32,8 @@ Jalankan lagi soal nomor 2, namun untuk mode secure
 ## Soal 4
 Berikan opini anda tentang perbandingan performa komunikasi pada soal 1, soal 2 , dan soal 3 dalam 1 paragraf, minimal 10 kalimat
 
+## Note
+Untuk menjalankan, masuk terlebih dahulu ke dalam salah satu folder soal lalu jalankan dengan command:
+- `python3 server.py` untuk server
+- `python3 client.py [thread_count] [request_count]` untuk client
+
