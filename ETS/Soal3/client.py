@@ -3,7 +3,7 @@ import socket
 import json
 import logging
 import time
-import concurrent.futures
+import threading
 import sys
 import ssl
 import os
@@ -68,7 +68,7 @@ def get_player_data(number=0):
     result = send_request(request)
     return result
 
-def request_player_data():
+def request_player_data(index, results):
     time_request_start = time.perf_counter()
 
     result = get_player_data(random.randint(1, 25))
@@ -76,31 +76,38 @@ def request_player_data():
         latency = time.perf_counter() - time_request_start
         print(result['name'], result['number'], result['position'])
         print(f'latency: {latency * 1000:.2f} ms')
-        return latency
+        results[index] = latency
     else:
         print('kegagalan pada data transfer')
-        return -1
+        results[index] = -1
 
 if __name__ == '__main__':
-    worker = int(sys.argv[1]) if len(sys.argv) >= 2 else 5
+    thread_count = int(sys.argv[1]) if len(sys.argv) >= 2 else 5
     request_count = int(sys.argv[2]) if len(sys.argv) >= 3 else 100
     response_count = 0
     latency_sum = 0
 
-    executor = concurrent.futures.ThreadPoolExecutor(max_workers=worker)
     tasks = {}
+    results = {}
 
     time_start = time.perf_counter()
-    for i in range(request_count):
-        tasks[i] = executor.submit(request_player_data)
+    loops = request_count
+    while loops > 0:
+        loops_inner =  thread_count if loops >= thread_count else loops
 
-    for i in range(request_count):
-        result = tasks[i].result()
-        if (result != -1):
-            response_count += 1
-            latency_sum += result
+        for i in range(loops_inner):
+            tasks[loops + i] = threading.Thread(target=request_player_data, args=(loops + i, results))
+            tasks[loops + i].start()
+
+        for i in range(loops_inner):
+            tasks[loops + i].join()
+            if (results[loops + i] != -1):
+                response_count += 1
+                latency_sum += results[loops + i]
+
+        loops -= loops_inner
     
-    print(f'With {worker} workers')
+    print(f'With {thread_count} workers')
     print(f'Request count: {request_count}')
     print(f'Response count: {response_count}')
     print(f'Execution time: {(time.perf_counter() - time_start) * 1000:.3f} ms')
