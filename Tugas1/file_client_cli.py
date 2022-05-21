@@ -2,6 +2,7 @@ import socket
 import json
 import base64
 import logging
+import shlex
 
 server_address=('localhost',6666)
 
@@ -52,6 +53,9 @@ def remote_list():
         return False
 
 def remote_get(filename=""):
+    if " " in filename:
+        filename = f'"{filename}"'
+
     command_str=f"GET {filename}"
     hasil = send_command(command_str)
     if not remote_error(hasil):
@@ -78,10 +82,26 @@ def remote_post(filename="",data=""):
             print(f"error: {e}")
             return False
 
+    if " " in filename:
+        filename = f'"{filename}"'
+
     command_str=f"POST {filename} {data}"
     hasil = send_command(command_str)
     if not remote_error(hasil):
         print("File berhasil diupload")
+        return True
+    else:
+        print("Gagal")
+        return False
+
+def remote_delete(filename=""):
+    if " " in filename:
+        filename = f'"{filename}"'
+
+    command_str=f"DELETE {filename}"
+    hasil = send_command(command_str)
+    if not remote_error(hasil):
+        print("File berhasil dihapus")
         return True
     else:
         print("Gagal")
@@ -105,7 +125,7 @@ def remote_error(hasil):
     return True
 
 def handle_command(command):
-    first, *rest = command.split()
+    first, *rest = shlex.split(command)
 
     try:
         if first.lower() == "list":
@@ -120,8 +140,15 @@ def handle_command(command):
         print(f"error: {e}")
 
 if __name__=='__main__':
+    print("Command list:")
+    print("- list")
+    print("- get <filename>")
+    print("- post <filename> [data] (if data is not specified, file will be read from local file)")
+    print("- delete <filename>")
+
     try:
         while True:
+            print()
             print("Enter command (^C to exit):")
             handle_command(input())
     except KeyboardInterrupt:

@@ -26,6 +26,7 @@ class FileProtocol:
             c_request = c[0].strip()
             logging.warning(f"memproses request: {c_request}")
             params = [x for x in c[1:]]
+            logging.warning(f"parameter: {params}")
             cl = getattr(self.file, c_request.lower())(params)
             return json.dumps(cl)
         except Exception:

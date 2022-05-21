@@ -6,6 +6,7 @@ ATURAN PROTOKOL:
 - string harus dalam format
   REQUEST spasi PARAMETER
 - PARAMETER dapat berkembang menjadi PARAMETER1 spasi PARAMETER2 dan seterusnya
+- Jika terdapat spasi di PARAMETER, maka PARAMETER tersebut diletakkan dalam tanda petik, contoh "para meter"
 - request harus diakhiri dengan linefeed ('\n')
 
 REQUEST YANG DILAYANI:
@@ -53,4 +54,15 @@ POST
   - status: ERROR
   - data: pesan kesalahan
 
-
+DELETE
+* TUJUAN: untuk menghapus file dengan menyertakan nama file dalam parameter
+* PARAMETER:
+  - PARAMETER1 : nama file
+* RESULT:
+- BERHASIL:
+  - status: OK
+  - data: pesan berhasil
+- GAGAL:
+  - status: ERROR
+  - data: pesan kesalahan
+  

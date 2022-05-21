@@ -30,6 +30,7 @@ class FileInterface:
             return dict(status='ERROR',data=str(e))
 
     def post(self,params=[]):
+        print(params)
         try:
             filename = params[0]
             data = params[1]
@@ -43,6 +44,20 @@ class FileInterface:
             return dict(status='ERROR',data='some parameters are missing')
         except FileExistsError:
             return dict(status='ERROR',data='filename already exists')
+        except Exception as e:
+            return dict(status='ERROR',data=str(e))
+
+    def delete(self,params=[]):
+        try:
+            filename = params[0]
+
+            os.remove(filename)
+
+            return dict(status='OK',data=f'{filename} deleted')
+        except IndexError:
+            return dict(status='ERROR',data='some parameters are missing')
+        except FileNotFoundError:
+            return dict(status='ERROR',data='file not found')
         except Exception as e:
             return dict(status='ERROR',data=str(e))
 
