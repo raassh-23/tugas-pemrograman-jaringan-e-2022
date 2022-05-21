@@ -12,6 +12,8 @@ def send_command(command_str=""):
     sock.connect(server_address)
     logging.warning(f"connected to server")
 
+    command_str += "\n"
+
     try:
         logging.warning(f"sending message ")
         sock.sendall(command_str.encode())
@@ -64,6 +66,27 @@ def remote_get(filename=""):
         print("Gagal")
         return False
 
+def remote_post(filename="",data=""):
+    if (data == ""):
+        try:
+            with open(filename,'rb') as fp:
+                data = base64.b64encode(fp.read()).decode('utf-8')
+        except FileNotFoundError:
+            print("error: file not found")
+            return False
+        except Exception as e:
+            print(f"error: {e}")
+            return False
+
+    command_str=f"POST {filename} {data}"
+    hasil = send_command(command_str)
+    if not remote_error(hasil):
+        print("File berhasil diupload")
+        return True
+    else:
+        print("Gagal")
+        return False
+
 def remote_unknown_command(command_str=""):
     hasil = send_command(command_str)
     if not remote_error(hasil):
@@ -81,19 +104,26 @@ def remote_error(hasil):
         
     return True
 
+def handle_command(command):
+    first, *rest = command.split()
+
+    try:
+        if first.lower() == "list":
+            remote_list()
+        elif first.lower() == "get":
+            remote_get(rest[0])
+        elif first.lower() == "post":
+            remote_post(rest[0], rest[1] if len(rest) > 1 else "")
+        else:
+            remote_unknown_command(command)
+    except Exception as e:
+        print(f"error: {e}")
+
 if __name__=='__main__':
     try:
         while True:
             print("Enter command (^C to exit):")
-            command = input()
-            
-            first, *rest = command.split()
-            if first.lower() == "list":
-                remote_list()
-            elif first.lower() == "get":
-                remote_get(rest[0] if rest[0] else "")
-            else:
-                remote_unknown_command(command)
+            handle_command(input())
     except KeyboardInterrupt:
         print("\nProgram exited.")
 
