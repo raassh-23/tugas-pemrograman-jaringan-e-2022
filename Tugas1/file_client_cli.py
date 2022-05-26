@@ -5,7 +5,7 @@ import logging
 import shlex
 
 # Mesin 1 sebagai server
-server_address=('172.16.16.1',6666)
+server_address=('172.16.16.101',6666)
 
 def send_command(command_str=""):
     global server_address
