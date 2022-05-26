@@ -50,7 +50,7 @@ class Server(threading.Thread):
             self.the_clients.append(clt)
 
 def main():
-    svr = Server(ipaddress='localhost',port=6666)
+    svr = Server(ipaddress='0.0.0.0',port=6666)
     svr.start()
 
 if __name__ == "__main__":

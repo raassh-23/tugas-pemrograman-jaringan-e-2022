@@ -4,7 +4,8 @@ import base64
 import logging
 import shlex
 
-server_address=('localhost',6666)
+# Mesin 1 sebagai server
+server_address=('172.16.16.1',6666)
 
 def send_command(command_str=""):
     global server_address
