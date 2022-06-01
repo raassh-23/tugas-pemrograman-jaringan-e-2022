@@ -1,12 +1,13 @@
 #!/bin/bash
 
-read -p "Enter URL: " urls_string
+read -p "Enter URLs (space separated): " urls_string
 urls=(${urls_string})
 
-read -p "Enter number of requests: " requests_string
+read -p "Enter number of requests (space separated): " requests_string
 requests=(${requests_string})
 
-con_levels=(1 5 10 20 40)
+read -p "Enter number of concurrency level (space separated): " con_levels_string
+con_levels=(${con_levels_string})
 
 for url in "${urls[@]}"; do
     for con in "${con_levels[@]}"; do
@@ -16,8 +17,7 @@ for url in "${urls[@]}"; do
             fi
 
             echo "Benchmarking $url with $con connections and $req requests"
-            ab -n $req -c $con $url > "results/ab-${con}-${req}-${url##*/}.txt"
-            sleep 1
+            ab -n $req -c $con $url > "results/ab-${con}-${req}-${url##*/}.txt" 2>&1 || sleep 60
         done
 
         echo ""
